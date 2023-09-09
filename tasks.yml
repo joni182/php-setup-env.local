@@ -1,0 +1,48 @@
+- hosts: localhost
+  vars:   
+    mysql_root_password: root
+  become: true
+  tasks:
+  - name: install git
+    apt: name=git state=present
+  - name: install vim
+    apt: name=vim state=present
+  - name: Installation install software-properties-common
+    apt: name=software-properties-common
+  - name: "Repo PHP 7.4"
+    apt_repository:
+      repo="ppa:ondrej/php"
+  - name: "Updating the repo"
+    apt: update_cache=yes
+  - name: Installation PHP 7.4
+    apt: name=php7.4 state=present
+  - name: install lamp stack
+    apt:
+      pkg:
+        - php5.6-mysql
+        - php5.6-curl
+        - php5.6-json
+        - php5.6-cgi
+        - php5.6-xsl
+        - php5.6-cgi
+        - php5.6-gd
+        - php5.6-mbstring
+        - php5.6-zip
+        - php5.6-xmlrpc
+        - php5.6-soap
+        - php5.6-intl
+        - php7.4-mysql
+        - php7.4-curl
+        - php7.4-json
+        - php7.4-cgi
+        - php7.4-xsl
+        - php7.4-cgi
+        - php7.4-gd
+        - php7.4-mbstring
+        - php7.4-zip
+        - php7.4-xmlrpc
+        - php7.4-soap
+        - php7.4-intl
+        - libapache2-mod-php
+      state: present
+      update_cache: yes

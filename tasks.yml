@@ -104,3 +104,11 @@
         - php8.1-bcmath
       state: present
       update_cache: yes
+# Additional software
+- name: Install DBeaver
+  become: yes
+  hosts: localhost
+  tasks:
+  - name: Install dbeaver-ce
+    community.general.snap:
+      name: dbeaver-ce

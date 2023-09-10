@@ -1,4 +1,49 @@
-- hosts: localhost
+# Set up Mysql 
+# https://medium.com/@kelom.x/ansible-mysql-installation-2513d0f70faf
+- name: setup Mysql with db db and remote login
+  become: yes
+  hosts: localhost
+  tasks:
+    - name: Installing Mysql  and dependencies
+      package:
+       name: "{{item}}"
+       state: present
+       update_cache: yes
+      loop:
+        - mysql-server
+        - mysql-client 
+        - python3-mysqldb
+        - libmysqlclient-dev
+      become: yes    
+    - name: start and enable mysql service
+      service:
+        name: mysql
+        state: started
+        enabled: yes    
+    - name: creating mysql user
+      mysql_user:
+        name: root
+        password: root
+        login_user: root
+        login_unix_socket: /var/run/mysqld/mysqld.sock
+      when: mysql_root_password is defined and mycnf.stat.exists == false
+    - name: Create database
+      mysql_db:
+        name: localhost
+        login_host: localhost
+        login_user: root
+        login_password: root
+        state: present
+      notify:
+        - Restart mysql  
+  handlers:
+    - name: Restart mysql
+      service:
+        name: mysql
+        state: restarted
+# Set up PHP
+- name: Set up PHP
+  hosts: localhost
   vars:   
     mysql_root_password: root
   become: true

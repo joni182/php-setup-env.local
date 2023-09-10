@@ -59,8 +59,12 @@
       repo="ppa:ondrej/php"
   - name: "Updating the repo"
     apt: update_cache=yes
+  - name: Installation PHP 5.6
+    apt: name=php5.6 state=present
   - name: Installation PHP 7.4
     apt: name=php7.4 state=present
+  - name: Installation PHP 8.1
+    apt: name=php8.1 state=present
   - name: install lamp stack
     apt:
       pkg:
@@ -89,5 +93,14 @@
         - php7.4-soap
         - php7.4-intl
         - libapache2-mod-php
+        - php8.1-cli
+        - php8.1-common
+        - php8.1-mysql
+        - php8.1-zip
+        - php8.1-gd
+        - php8.1-mbstring
+        - php8.1-curl
+        - php8.1-xml
+        - php8.1-bcmath
       state: present
       update_cache: yes

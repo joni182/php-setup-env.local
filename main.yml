@@ -1,6 +1,29 @@
+
+# Install Composer
+# https://pipo.blog/articles/20160607-ansible-composer-install
+- name: install composer
+  become: yes
+  hosts: localhost
+  vars:
+    composer_url: https://getcomposer.org/download/latest-stable/composer.phar
+  tasks:
+    # Install Composer the lightweight way (without using installer)
+    # https://getcomposer.org/download
+    - name: Composer | Install Composer latest-stable
+      get_url:
+        url: '{{ composer_url }}'
+        checksum: 'sha256:{{ composer_url }}.sha256sum'
+        dest: /usr/local/bin/composer.phar
+        mode: 0755
+
+    - name: Composer | Symlink composer.phar
+      file:
+        src: composer.phar
+        dest: /usr/local/bin/composer
+        state: link
 # Set up Mysql 
 # https://medium.com/@kelom.x/ansible-mysql-installation-2513d0f70faf
-- name: setup Mysql with db db and remote login
+- name: setup Mysql with db
   become: yes
   hosts: localhost
   tasks:
@@ -44,8 +67,6 @@
 # Set up PHP
 - name: Set up PHP
   hosts: localhost
-  vars:   
-    mysql_root_password: root
   become: true
   tasks:
   - name: install git
@@ -104,6 +125,49 @@
         - php8.1-bcmath
       state: present
       update_cache: yes
+# Install apache
+- name: install apache2
+  hosts: localhost
+  tasks:
+  - name: install apache2
+    become: true
+    apt: name=apache2 update_cache=yes state=latest
+# Install apache
+- name: Configure apache2
+  hosts: localhost
+  tasks:
+  - copy:
+      src: ./resources/apache2.conf
+      dest: /etc/apache2/apache2.conf
+      owner: root
+      group: root
+      mode: 0644
+    become: true
+  - copy:
+      src: ./resources/000-default.conf
+      dest: /etc/apache2/sites-available/000-default.conf
+      owner: root
+      group: root
+      mode: 0644
+    become: true
+  - name: Creates directory
+    file:
+      path: ~/www/php.info/public_html
+      owner: joni
+      group: joni
+      state: directory
+    become: true
+  - copy: 
+      content: "<?php phpinfo(); ?>" 
+      dest: ~/www/php.info/public_html/index.php
+      owner: joni
+      group: joni
+    become: true
+  - name: Start service apache2, if not started
+    ansible.builtin.service:
+      name: apache2
+      state: started
+    become: true
 # Additional software
 - name: Install DBeaver
   become: yes
